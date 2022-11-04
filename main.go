@@ -4,6 +4,7 @@ import (
 	"RGBContribution/contribution"
 	"github.com/labstack/echo/v4"
 	"net/http"
+	"os"
 )
 
 func one(c echo.Context) error {
@@ -24,5 +25,5 @@ func main() {
 
 	e.GET("/users/:name/:year", one)
 
-	e.Logger.Fatal(e.Start(":8081"))
+	e.Logger.Fatal(e.Start(os.Getenv("PORT")))
 }

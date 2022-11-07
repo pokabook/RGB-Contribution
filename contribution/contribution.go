@@ -5,6 +5,7 @@ import (
 	"github.com/PuerkitoBio/goquery"
 	"log"
 	"net/http"
+	"strconv"
 )
 
 var BASEURL = "https://github.com/"
@@ -26,8 +27,8 @@ type Result struct {
 
 type Contribution struct {
 	Date  string `json:"date"`
-	Count string `json:"count"`
-	Level string `json:"level"`
+	Count int    `json:"count"`
+	Level int    `json:"level"`
 }
 
 func Scr(user User) Result {
@@ -78,8 +79,13 @@ func getContribution(user UserURL, c2 chan []Contribution, c4 chan string) {
 
 func extractGrass(s *goquery.Selection, c3 chan Contribution) {
 	date, _ := s.Attr("data-date")
-	count, _ := s.Attr("data-count")
-	level, _ := s.Attr("data-level")
+	tmpCount, _ := s.Attr("data-count")
+	tmpLevel, _ := s.Attr("data-level")
+
+	count, err := strconv.Atoi(tmpCount)
+	checkErr(err)
+	level, err := strconv.Atoi(tmpLevel)
+	checkErr(err)
 	c3 <- Contribution{
 		Date:  date,
 		Count: count,

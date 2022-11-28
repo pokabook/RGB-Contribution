@@ -5,6 +5,7 @@ import (
 	"github.com/PuerkitoBio/goquery"
 	"log"
 	"net/http"
+	"sort"
 	"strconv"
 )
 
@@ -31,7 +32,13 @@ type Contribution struct {
 	Level int    `json:"level"`
 }
 
-func Scr(user User) Result {
+type ByDate []Contribution
+
+func (a ByDate) Len() int           { return len(a) }
+func (a ByDate) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a ByDate) Less(i, j int) bool { return a[i].Date < a[j].Date }
+
+func Scr(user User, resultChannel chan Result) {
 	var c1 = make(chan UserURL)
 	var c2 = make(chan []Contribution)
 	var c4 = make(chan string)
@@ -43,10 +50,12 @@ func Scr(user User) Result {
 
 	con := <-c2
 	name := <-c4
+	sort.Sort(ByDate(con))
 	result := Result{
 		UserName:      name,
 		Contributions: con}
-	return result
+
+	resultChannel <- result
 }
 
 func getContribution(user UserURL, c2 chan []Contribution, c4 chan string) {

@@ -10,13 +10,13 @@ import (
 func one(c echo.Context) error {
 	name := c.Param("name")
 	year := c.Param("year")
-
+	var resultChannel = make(chan contribution.Result)
 	user := contribution.User{
 		Name: name,
 		Year: year}
 
-	result := contribution.Scr(user)
-
+	go contribution.Scr(user, resultChannel)
+	result := <-resultChannel
 	return c.JSON(http.StatusOK, result)
 }
 
